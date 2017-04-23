@@ -21,7 +21,7 @@ protocol Coordinator: class {
     func start(completion: CoordinatorCallback?)
     func stop(completion: CoordinatorCallback?)
     
-    func startChild<T: Coordinator>(_ coordinator: T, completion: CoordinatorCallback?)
+    func startChild(_ coordinator: Coordinator, completion: CoordinatorCallback?)
     func stopChild(identifier: String, completion: CoordinatorCallback?)
     
     func childFinished(identifier: String)
@@ -35,7 +35,7 @@ protocol PresentingCoordinator: Coordinator {
 extension Coordinator {
     var identifier: String { return String(describing: type(of: self)) }
     
-    func startChild<T: Coordinator>(_ coordinator: T, completion: CoordinatorCallback?) {
+    func startChild(_ coordinator: Coordinator, completion: CoordinatorCallback?) {
         children[coordinator.identifier] = coordinator
         coordinator.parent = self
         coordinator.start(completion: completion)
@@ -59,7 +59,7 @@ extension Coordinator {
 }
 
 extension PresentingCoordinator {
-    func presentChild<T>(_ coordinator: T, completion: CoordinatorCallback? = nil) where T : Coordinator {
+    func presentChild(_ coordinator: Coordinator, completion: CoordinatorCallback? = nil) {
         startChild(coordinator) { [weak self] child in
             self?.present(childCoordinator: child)
             completion?(child)
