@@ -8,19 +8,19 @@
 
 import UIKit
 
-typealias CoordinatorCallback = (Component) -> Void
-
 protocol Component: class {
+    typealias Callback = (Component) -> Void
+    
     var identifier: String { get }
     
     weak var parent: Component? { get set }
     var children: [String: Component] { get set }
     
-    func start(completion: CoordinatorCallback?)
-    func stop(completion: CoordinatorCallback?)
+    func start(completion: Callback?)
+    func stop(completion: Callback?)
     
-    func startChild(_ coordinator: Component, completion: CoordinatorCallback?)
-    func stopChild(identifier: String, completion: CoordinatorCallback?)
+    func startChild(_ coordinator: Component, completion: Callback?)
+    func stopChild(identifier: String, completion: Callback?)
     
     func childFinished(identifier: String)
 }
@@ -28,11 +28,6 @@ protocol Component: class {
 protocol Coordinator: Component {
     var sceneViewController: UIViewController { get }
 }
-
-/*
- Component -> Coordinator
- Coordinator -> Coordinator
- */
 
 protocol PresentingComponent: Component {
     func present(childCoordinator: Coordinator)
@@ -44,13 +39,13 @@ typealias PresentingCoordinator = PresentingComponent & Coordinator
 extension Component {
     var identifier: String { return String(describing: type(of: self)) }
     
-    func startChild(_ coordinator: Component, completion: CoordinatorCallback?) {
+    func startChild(_ coordinator: Component, completion: Callback?) {
         children[coordinator.identifier] = coordinator
         coordinator.parent = self
         coordinator.start(completion: completion)
     }
     
-    func stopChild(identifier: String, completion: CoordinatorCallback?) {
+    func stopChild(identifier: String, completion: Callback?) {
         guard let child = children[identifier] else {
             fatalError("Child coordinator with identifier \(identifier) not found.")
         }
@@ -74,16 +69,19 @@ extension Coordinator {
 }
 
 extension PresentingComponent {
-    func presentChild(_ coordinator: Coordinator, completion: CoordinatorCallback? = nil) {
+    func presentChild(_ coordinator: Coordinator, completion: Callback? = nil) {
         startChild(coordinator) { [weak self] child in
-            self?.present(childCoordinator: child as! Coordinator)
+            self?.present(childCoordinator: coordinator)
             completion?(child)
         }
     }
     
-    func dismissChild(identifier: String, completion: CoordinatorCallback? = nil) {
+    func dismissChild(identifier: String, completion: Callback? = nil) {
         stopChild(identifier: identifier) { [weak self] child in
-            self?.dismiss(childCoordinator: child as! Coordinator)
+            guard let childCoordinator = child as? Coordinator else {
+                fatalError("\(type(of:self)) tried to dismiss not a Coordinator")
+            }
+            self?.dismiss(childCoordinator: childCoordinator)
             completion?(child)
         }
     }

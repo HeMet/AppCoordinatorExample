@@ -13,12 +13,12 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
     
-    func start(completion: CoordinatorCallback?) {
+    func start(completion: Callback?) {
         addElement()
         completion?(self)
     }
     
-    func stop(completion: CoordinatorCallback?) {
+    func stop(completion: Callback?) {
         completion?(self)
     }
 

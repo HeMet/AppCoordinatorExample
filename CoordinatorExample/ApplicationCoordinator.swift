@@ -23,7 +23,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         self.mode = mode
     }
     
-    func start(completion: CoordinatorCallback?) {
+    func start(completion: Callback?) {
         let child: Coordinator
         switch mode {
         case .modalExample:
@@ -39,7 +39,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         }
     }
     
-    func stop(completion: CoordinatorCallback?) {
+    func stop(completion: Callback?) {
         completion?(self)
     }
     

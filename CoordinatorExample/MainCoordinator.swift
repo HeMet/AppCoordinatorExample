@@ -24,13 +24,13 @@ class MainCoordinator: CoordinatorProps, Coordinator {
         navigator = MainNavigator(coordinator: self)
     }
     
-    func start(completion: CoordinatorCallback?) {
+    func start(completion: Callback?) {
         navigator.presentMaster { masterVC in
         }
         completion?(self)
     }
     
-    func stop(completion: CoordinatorCallback?) {
+    func stop(completion: Callback?) {
         completion?(self)
     }
     
