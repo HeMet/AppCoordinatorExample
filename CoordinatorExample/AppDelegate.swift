@@ -13,9 +13,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
+    var mainCoordinator = MainCoordinator()
+    var stackCoordinator = StackCoordinator()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        let wnd = UIWindow(frame: UIScreen.main.bounds)
+        window = wnd
+        
+//        mainCoordinator.start(completion: nil)        
+//        wnd.rootViewController = mainCoordinator.sceneViewController
+        stackCoordinator.start(completion: nil)
+        wnd.rootViewController = stackCoordinator.sceneViewController
+        wnd.makeKeyAndVisible()
+        
         return true
     }
 
