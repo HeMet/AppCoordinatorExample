@@ -27,6 +27,11 @@ protocol Coordinator: class {
     func childFinished(identifier: String)
 }
 
+protocol PresentingCoordinator: Coordinator {
+    func present(childCoordinator: Coordinator)
+    func dismiss(childCoordinator: Coordinator)
+}
+
 extension Coordinator {
     var identifier: String { return String(describing: type(of: self)) }
     
@@ -50,5 +55,21 @@ extension Coordinator {
     
     func childFinished(identifier: String) {
         stopChild(identifier: identifier, completion: nil)
+    }
+}
+
+extension PresentingCoordinator {
+    func presentChild<T>(_ coordinator: T, completion: CoordinatorCallback? = nil) where T : Coordinator {
+        startChild(coordinator) { [weak self] child in
+            self?.present(childCoordinator: child)
+            completion?(child)
+        }
+    }
+    
+    func dismissChild(identifier: String, completion: CoordinatorCallback? = nil) {
+        stopChild(identifier: identifier) { [weak self] child in
+            self?.dismiss(childCoordinator: child)
+            completion?(child)
+        }
     }
 }

@@ -33,14 +33,9 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         childViewController.output = self
         updateColor()
         
-        timer = Timer(interval: 2) { [weak self] in
-            DispatchQueue.main.async {
-                self?.updateColor()
-            }
-        }
+        timer = makeTimer()
         timer.star()
-        
-        
+                
         completion?(self)
     }
     
@@ -48,6 +43,14 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         timer.stop()
         
         completion?(self)
+    }
+    
+    private func makeTimer() -> Timer {
+        return Timer(interval: 2) { [weak self] in
+            DispatchQueue.main.async {
+                self?.updateColor()
+            }
+        }
     }
     
     private func updateColor() {

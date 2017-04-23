@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StackCoordinator: CoordinatorProps, Coordinator {
+class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
@@ -24,10 +24,7 @@ class StackCoordinator: CoordinatorProps, Coordinator {
 
     func addElement() {
         let child = makeChildCoordinator()
-        
-        startChild(child) { [weak self] childCoordinator in
-            self?.addChildSceneViewController(childCoordinator)
-        }
+        presentChild(child)
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
@@ -37,12 +34,10 @@ class StackCoordinator: CoordinatorProps, Coordinator {
     }
     
     func removeChild(coordinator: Coordinator) {
-        stopChild(identifier: coordinator.identifier) { [weak self] childCoordinator in
-            self?.removeChildSceneViewController(childCoordinator)
-        }
+        dismissChild(identifier: coordinator.identifier)
     }
     
-    func addChildSceneViewController(_ coordinator: Coordinator) {
+    func present(childCoordinator coordinator: Coordinator) {
         let childScene = coordinator.sceneViewController
 
         stackViewController.addChildViewController(childScene)
@@ -51,7 +46,7 @@ class StackCoordinator: CoordinatorProps, Coordinator {
         childScene.didMove(toParentViewController: stackViewController)
     }
     
-    func removeChildSceneViewController(_ coordinator: Coordinator) {
+    func dismiss(childCoordinator coordinator: Coordinator) {
         coordinator.sceneViewController.willMove(toParentViewController: nil)
         stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
         coordinator.sceneViewController.removeFromParentViewController()
