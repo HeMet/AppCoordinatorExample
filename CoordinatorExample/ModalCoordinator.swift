@@ -8,10 +8,8 @@
 
 import UIKit
 
-class ModalCoordinator: Coordinator {
+class ModalCoordinator: CoordinatorProps, Coordinator {
     
-    weak var parent: Coordinator?
-    var children: [String: Coordinator] = [:]
     let sceneViewController = UIViewController()
     
     func start(completion: CoordinatorCallback?) {
@@ -33,17 +31,6 @@ class ModalCoordinator: Coordinator {
             if let `self` = self {
                 completion?(self)
             }
-        }
-    }
-}
-
-extension Optional {
-    func applyTo(_ receiver: (Wrapped) -> Void) {
-        switch self {
-        case .some(let value):
-            receiver(value)
-        default:
-            break
         }
     }
 }

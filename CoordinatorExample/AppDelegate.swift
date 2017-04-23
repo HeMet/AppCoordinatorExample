@@ -15,17 +15,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var mainCoordinator = MainCoordinator()
     var stackCoordinator = StackCoordinator()
+    var appCoordinator: ApplicationCoordinator!
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         let wnd = UIWindow(frame: UIScreen.main.bounds)
         window = wnd
         
-//        mainCoordinator.start(completion: nil)        
-//        wnd.rootViewController = mainCoordinator.sceneViewController
-        stackCoordinator.start(completion: nil)
-        wnd.rootViewController = stackCoordinator.sceneViewController
-        wnd.makeKeyAndVisible()
+        appCoordinator = ApplicationCoordinator(window: wnd, mode: .modalExample)
+        appCoordinator.start(completion: nil)
         
         return true
     }

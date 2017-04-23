@@ -9,38 +9,33 @@
 import UIKit
 
 // how to push data from Coordinator to ViewControllers?
-class MainCoordinator: Coordinator {
+class MainCoordinator: CoordinatorProps, Coordinator {
     var sceneViewController: UIViewController {
         return navigator.sceneViewController
     }
-    
-    weak var parent: Coordinator?
-    var children: [String: Coordinator] = [:]
     
     var navigator: MainNavigator!
     
     // sort of view model
     var selectedId: String?
     
-    init() {
+    override init() {
+        super.init()
         navigator = MainNavigator(coordinator: self)
     }
     
     func start(completion: CoordinatorCallback?) {
         navigator.presentMaster { masterVC in
-            
         }
+        completion?(self)
     }
     
     func stop(completion: CoordinatorCallback?) {
-        
+        completion?(self)
     }
     
     func detailsTapped() {
         selectedId = UUID().uuidString
-//        navigator.presentDetails { detailsVC in
-//            
-//        }
         let modal = ModalCoordinator()
         startChild(modal, completion: nil)
     }
