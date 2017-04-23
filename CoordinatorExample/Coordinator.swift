@@ -8,34 +8,43 @@
 
 import UIKit
 
-typealias CoordinatorCallback = (Coordinator) -> Void
+typealias CoordinatorCallback = (Component) -> Void
 
-protocol Coordinator: class {
+protocol Component: class {
     var identifier: String { get }
     
-    weak var parent: Coordinator? { get set }
-    var children: [String: Coordinator] { get set }
-    
-    var sceneViewController: UIViewController { get }
+    weak var parent: Component? { get set }
+    var children: [String: Component] { get set }
     
     func start(completion: CoordinatorCallback?)
     func stop(completion: CoordinatorCallback?)
     
-    func startChild(_ coordinator: Coordinator, completion: CoordinatorCallback?)
+    func startChild(_ coordinator: Component, completion: CoordinatorCallback?)
     func stopChild(identifier: String, completion: CoordinatorCallback?)
     
     func childFinished(identifier: String)
 }
 
-protocol PresentingCoordinator: Coordinator {
+protocol Coordinator: Component {
+    var sceneViewController: UIViewController { get }
+}
+
+/*
+ Component -> Coordinator
+ Coordinator -> Coordinator
+ */
+
+protocol PresentingComponent: Component {
     func present(childCoordinator: Coordinator)
     func dismiss(childCoordinator: Coordinator)
 }
 
-extension Coordinator {
+typealias PresentingCoordinator = PresentingComponent & Coordinator
+
+extension Component {
     var identifier: String { return String(describing: type(of: self)) }
     
-    func startChild(_ coordinator: Coordinator, completion: CoordinatorCallback?) {
+    func startChild(_ coordinator: Component, completion: CoordinatorCallback?) {
         children[coordinator.identifier] = coordinator
         coordinator.parent = self
         coordinator.start(completion: completion)
@@ -58,17 +67,23 @@ extension Coordinator {
     }
 }
 
-extension PresentingCoordinator {
+extension Coordinator {
+    var parentCoordinator: Coordinator? {
+        return parent as? Coordinator
+    }
+}
+
+extension PresentingComponent {
     func presentChild(_ coordinator: Coordinator, completion: CoordinatorCallback? = nil) {
         startChild(coordinator) { [weak self] child in
-            self?.present(childCoordinator: child)
+            self?.present(childCoordinator: child as! Coordinator)
             completion?(child)
         }
     }
     
     func dismissChild(identifier: String, completion: CoordinatorCallback? = nil) {
         stopChild(identifier: identifier) { [weak self] child in
-            self?.dismiss(childCoordinator: child)
+            self?.dismiss(childCoordinator: child as! Coordinator)
             completion?(child)
         }
     }

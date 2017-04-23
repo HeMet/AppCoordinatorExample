@@ -9,6 +9,6 @@
 import UIKit
 
 class CoordinatorProps {
-    weak var parent: Coordinator?
-    var children: [String: Coordinator] = [:]
+    weak var parent: Component?
+    var children: [String: Component] = [:]
 }

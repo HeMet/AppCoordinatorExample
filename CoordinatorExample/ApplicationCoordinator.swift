@@ -8,15 +8,13 @@
 
 import UIKit
 
-class ApplicationCoordinator: CoordinatorProps, PresentingCoordinator {
+class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
 
     enum Mode {
         case modalExample
         case stackExample
     }
     
-    // не используется
-    let sceneViewController = UIViewController()
     let window: UIWindow
     let mode: Mode
     
