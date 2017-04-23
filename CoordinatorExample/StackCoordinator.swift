@@ -21,19 +21,19 @@ class StackCoordinator: CoordinatorProps, Coordinator {
     func stop(completion: CoordinatorCallback?) {
         completion?(self)
     }
-    
-    func addAnother() {
-        addElement()
-    }
 
     func addElement() {
-        let child = ChildCoordinator()
-        child.colorSeed = children.count
-        child.output = self
+        let child = makeChildCoordinator()
         
         startChild(child) { [weak self] childCoordinator in
             self?.addChildSceneViewController(childCoordinator)
         }
+    }
+    
+    func makeChildCoordinator() -> ChildCoordinator {
+        let child = ChildCoordinator(colorSeed: children.count)
+        child.output = self
+        return child
     }
     
     func removeChild(coordinator: Coordinator) {

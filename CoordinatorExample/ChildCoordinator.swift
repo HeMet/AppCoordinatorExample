@@ -21,8 +21,13 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
     var childViewController: ChildViewControllerInput = ChildViewController()
     
     weak var output: ChildCoordinatorOutput?
-    var colorSeed: Int = 0
-    var timer: Timer!
+    
+    private var colorSeed: Int
+    private var timer: Timer!
+    
+    init(colorSeed: Int) {
+        self.colorSeed = colorSeed
+    }
     
     func start(completion: CoordinatorCallback?) {
         childViewController.output = self
@@ -45,7 +50,7 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         completion?(self)
     }
     
-    func updateColor() {
+    private func updateColor() {
         childViewController.update(using: color(seed: colorSeed))
         colorSeed += 1
     }
