@@ -8,6 +8,10 @@
 
 import UIKit
 
+/*
+ Основной блок для организации приложения.
+ Вместе с другими компонентами образует древовидную структуру.
+ */
 protocol Component: class {
     typealias Callback = (Component) -> Void
     
@@ -25,10 +29,19 @@ protocol Component: class {
     func childFinished(identifier: String)
 }
 
+/*
+ Координатор - это компонент, который координирует работу
+ представления (View) и модели (Model)
+ */
 protocol Coordinator: Component {
     var sceneViewController: UIViewController { get }
 }
 
+/*
+ Отображающий компонент - это компонент, который может отобразить
+ координаторы. При этом он сам может являться координатором,
+ но не обязательно.
+ */
 protocol PresentingComponent: Component {
     func present(childCoordinator: Coordinator)
     func dismiss(childCoordinator: Coordinator)

@@ -71,6 +71,24 @@
 			name = Stack;
 			sourceTree = "<group>";
 		};
+		84D428E61EACEEF700F7EC3E /* StackExample */ = {
+			isa = PBXGroup;
+			children = (
+				84D428DF1EACA4F100F7EC3E /* Stack */,
+				84D428DE1EACA4D300F7EC3E /* Child */,
+			);
+			name = StackExample;
+			sourceTree = "<group>";
+		};
+		84D428E71EACEF0400F7EC3E /* ModalExample */ = {
+			isa = PBXGroup;
+			children = (
+				84DCECD51EAA73C70094B64C /* Modal */,
+				84DCECD41EAA73B50094B64C /* Main */,
+			);
+			name = ModalExample;
+			sourceTree = "<group>";
+		};
 		84DCECA91E7548BB0094B64C = {
 			isa = PBXGroup;
 			children = (
@@ -90,17 +108,15 @@
 		84DCECB41E7548BB0094B64C /* CoordinatorExample */ = {
 			isa = PBXGroup;
 			children = (
-				84D428DF1EACA4F100F7EC3E /* Stack */,
-				84D428DE1EACA4D300F7EC3E /* Child */,
-				84DCECD51EAA73C70094B64C /* Modal */,
-				84DCECD41EAA73B50094B64C /* Main */,
+				84D428E61EACEEF700F7EC3E /* StackExample */,
+				84D428E71EACEF0400F7EC3E /* ModalExample */,
 				84DCECB51E7548BB0094B64C /* AppDelegate.swift */,
+				84D428E41EACBDDB00F7EC3E /* ApplicationCoordinator.swift */,
 				84DCECC71E7548CB0094B64C /* Coordinator.swift */,
 				84D428E21EACAC6000F7EC3E /* CoordinatorProps.swift */,
 				84DCECBC1E7548BB0094B64C /* Assets.xcassets */,
 				84DCECBE1E7548BB0094B64C /* LaunchScreen.storyboard */,
 				84DCECC11E7548BB0094B64C /* Info.plist */,
-				84D428E41EACBDDB00F7EC3E /* ApplicationCoordinator.swift */,
 			);
 			path = CoordinatorExample;
 			sourceTree = "<group>";
