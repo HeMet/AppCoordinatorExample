@@ -13,16 +13,28 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
     
-    func start(completion: Callback?) {
-        addElement()
+    func start(context: Any, completion: Callback?) {
+        if let target = context as? ExampleTarget, target.example == .stackExample {
+            for _ in 0..<max(1, target.stackItems) {
+                addElement()
+            }
+        } else {
+            addElement()
+        }
         completion?(self)
     }
     
-    func stop(completion: Callback?) {
+    func stop(context: Any, completion: Callback?) {
         completion?(self)
     }
 
     func addElement() {
+        guard children.count < 3 else {
+            let target = ExampleTarget(example: .modalExample, stackItems: 1)
+            transit(to: target)
+            return
+        }
+        
         let child = makeChildCoordinator()
         presentChild(child)
     }
@@ -37,7 +49,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
         dismissChild(identifier: coordinator.identifier)
     }
     
-    func present(childCoordinator coordinator: Coordinator) {
+    func present(childCoordinator coordinator: Coordinator, context: Any) {
         let childScene = coordinator.sceneViewController
 
         stackViewController.addChildViewController(childScene)
@@ -46,7 +58,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
         childScene.didMove(toParentViewController: stackViewController)
     }
     
-    func dismiss(childCoordinator coordinator: Coordinator) {
+    func dismiss(childCoordinator coordinator: Coordinator, context: Any) {
         coordinator.sceneViewController.willMove(toParentViewController: nil)
         stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
         coordinator.sceneViewController.removeFromParentViewController()
@@ -63,6 +75,31 @@ extension StackCoordinator: ChildCoordinatorOutput {
     }
 }
 
+extension StackCoordinator: Transitable {
+    func performTransition(to target: Any) {
+        if let target = target as? ExampleTarget, target.example == .stackExample {
+            loop: while true {
+                switch children.count.compare(target.stackItems) {
+                case .orderedSame:
+                    break loop
+                case .orderedAscending:
+                    let id = children.values.first!.identifier
+                    dismissChild(identifier: id)
+                case .orderedDescending:
+                    addElement()
+                }
+            }
+        }
+    }
+    
+    static func canTransit(to target: Any) -> Bool {
+        if let example = target as? ExampleTarget {
+            return example.example == .stackExample
+        }
+        return false
+    }
+}
+
 class StackViewController: UIViewController {
     var coordinator: StackCoordinator!
     
@@ -75,5 +112,17 @@ class StackViewController: UIViewController {
         _view.axis = .vertical
         _view.distribution = .fillEqually
         view = _view
+    }
+}
+
+extension Int {
+    func compare(_ value: Int) -> ComparisonResult {
+        if self == value {
+            return .orderedSame
+        }
+        if self > value {
+            return .orderedDescending
+        }
+        return .orderedAscending
     }
 }

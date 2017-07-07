@@ -24,19 +24,33 @@ class MainCoordinator: CoordinatorProps, Coordinator {
         navigator = MainNavigator(coordinator: self)
     }
     
-    func start(completion: Callback?) {
+    func start(context: Any, completion: Callback?) {
         navigator.presentMaster { masterVC in
         }
         completion?(self)
     }
     
-    func stop(completion: Callback?) {
+    func stop(context: Any, completion: Callback?) {
         completion?(self)
     }
     
     func detailsTapped() {
-        selectedId = UUID().uuidString
-        let modal = ModalCoordinator()
-        startChild(modal, completion: nil)
+//        selectedId = UUID().uuidString
+//        let modal = ModalCoordinator()
+//        startChild(modal, completion: nil)
+        transit(to: ExampleTarget(example: .stackExample, stackItems: 3))
+    }
+}
+
+extension MainCoordinator: Transitable {
+    func performTransition(to: Any) {
+        // ничего
+    }
+    
+    static func canTransit(to target: Any) -> Bool {
+        if let example = target as? ExampleTarget {
+            return example.example == .modalExample
+        }
+        return false
     }
 }

@@ -29,7 +29,7 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         self.colorSeed = colorSeed
     }
     
-    func start(completion: Callback?) {
+    func start(context: Any, completion: Callback?) {
         childViewController.output = self
         updateColor()
         
@@ -39,7 +39,7 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         completion?(self)
     }
     
-    func stop(completion: Callback?) {
+    func stop(context: Any, completion: Callback?) {
         timer.stop()
         
         completion?(self)
