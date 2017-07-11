@@ -13,7 +13,11 @@ class ModalCoordinator: CoordinatorProps, Coordinator {
     let sceneViewController = UIViewController()
     
     func start(context: Any, completion: Callback?) {
-        parentCoordinator?.sceneViewController.present(sceneViewController, animated: true) { [weak self] in
+        guard let parent = parentCoordinator else {
+            completion?(self)
+            return
+        }
+        parent.sceneViewController.present(sceneViewController, animated: true) { [weak self] in
             if let `self` = self {
                 completion?(self)
             }

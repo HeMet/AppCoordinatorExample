@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		21C14FCD1F0FA971006BC7DE /* Transitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C14FCC1F0FA971006BC7DE /* Transitable.swift */; };
+		21C375D71F14F19000BB7E80 /* ExamplesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C375D61F14F19000BB7E80 /* ExamplesCoordinator.swift */; };
 		84D428D91EABD53800F7EC3E /* StackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428D81EABD53800F7EC3E /* StackCoordinator.swift */; };
 		84D428DB1EAC8FD700F7EC3E /* ChildCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428DA1EAC8FD700F7EC3E /* ChildCoordinator.swift */; };
 		84D428DD1EACA4B700F7EC3E /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428DC1EACA4B700F7EC3E /* Timer.swift */; };
@@ -26,6 +27,7 @@
 
 /* Begin PBXFileReference section */
 		21C14FCC1F0FA971006BC7DE /* Transitable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transitable.swift; sourceTree = "<group>"; };
+		21C375D61F14F19000BB7E80 /* ExamplesCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesCoordinator.swift; sourceTree = "<group>"; };
 		84D428D81EABD53800F7EC3E /* StackCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackCoordinator.swift; sourceTree = "<group>"; };
 		84D428DA1EAC8FD700F7EC3E /* ChildCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChildCoordinator.swift; sourceTree = "<group>"; };
 		84D428DC1EACA4B700F7EC3E /* Timer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
@@ -55,6 +57,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		21C375D51F14F16900BB7E80 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				21C375D61F14F19000BB7E80 /* ExamplesCoordinator.swift */,
+			);
+			name = Examples;
+			sourceTree = "<group>";
+		};
 		84D428DE1EACA4D300F7EC3E /* Child */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +120,7 @@
 		84DCECB41E7548BB0094B64C /* CoordinatorExample */ = {
 			isa = PBXGroup;
 			children = (
+				21C375D51F14F16900BB7E80 /* Examples */,
 				84D428E61EACEEF700F7EC3E /* StackExample */,
 				84D428E71EACEF0400F7EC3E /* ModalExample */,
 				84DCECB51E7548BB0094B64C /* AppDelegate.swift */,
@@ -217,6 +228,7 @@
 				84D428E11EACA50E00F7EC3E /* ChildViewController.swift in Sources */,
 				84DCECD11EA925F60094B64C /* MainNavigator.swift in Sources */,
 				84DCECD31EA930540094B64C /* MainAssembly.swift in Sources */,
+				21C375D71F14F19000BB7E80 /* ExamplesCoordinator.swift in Sources */,
 				84DCECCF1EA9258D0094B64C /* MainCoordinator.swift in Sources */,
 				84D428DD1EACA4B700F7EC3E /* Timer.swift in Sources */,
 				84D428D91EABD53800F7EC3E /* StackCoordinator.swift in Sources */,

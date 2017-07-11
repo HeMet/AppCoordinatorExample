@@ -26,7 +26,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
     func start(context: Any, completion: Callback?) {
         let child = makeChild(mode: mode)
         
-        startChild(child) { [weak self] coordinator in
+        startChild(child, context: ExampleTarget(example: mode, stackItems: 3)) { [weak self] coordinator in
             if let `self` = self {
                 completion?(self)
             }
@@ -34,12 +34,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
     }
     
     func makeChild(mode: Mode) -> Coordinator {
-        switch mode {
-        case .modalExample:
-            return MainCoordinator()
-        case .stackExample:
-            return StackCoordinator()
-        }
+        return ExamplesCoordinator()
     }
     
     func stop(context: Any, completion: Callback?) {
