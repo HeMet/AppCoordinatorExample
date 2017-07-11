@@ -44,7 +44,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
 
     func addElement() {
         guard children.count < 3 else {
-            let target = ExampleTarget(example: .modalExample, stackItems: 1)
+            let target = ExampleTarget(example: .modalExample, stackItems: 1, showModalScreen: true)
             transit(to: target)
             return
         }

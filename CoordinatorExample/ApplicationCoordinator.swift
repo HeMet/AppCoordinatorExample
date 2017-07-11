@@ -26,7 +26,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
     func start(context: Any, completion: Callback?) {
         let child = makeChild(mode: mode)
         
-        startChild(child, context: ExampleTarget(example: mode, stackItems: 3)) { [weak self] coordinator in
+        startChild(child, context: ExampleTarget(example: mode, stackItems: 3, showModalScreen: false)) { [weak self] coordinator in
             if let `self` = self {
                 completion?(self)
             }
@@ -74,4 +74,5 @@ extension ApplicationCoordinator: TransitionDispatcher {
 struct ExampleTarget {
     let example: ApplicationCoordinator.Mode
     let stackItems: Int
+    let showModalScreen: Bool
 }

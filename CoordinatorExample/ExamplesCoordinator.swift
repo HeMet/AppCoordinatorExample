@@ -10,15 +10,13 @@ import Foundation
 import UIKit
 
 class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
-    private let tabController = UITabBarController()
+    fileprivate let tabController = UITabBarController()
     
     var sceneViewController: UIViewController {
         return tabController
     }
     
     func start(context: Any, completion: Component.Callback?) {
-        let example = (context as? ExampleTarget)?.example ?? .stackExample
-        
         startChild(StackCoordinator(), context: context) { _ in
             self.startChild(MainCoordinator(), context: context) { _ in
                 guard let presenter = self.parent as? PresentingComponent else {
@@ -26,12 +24,7 @@ class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
                 }
                 
                 presenter.presentChild(childCoordinator: self, context: context) { _ in
-                    switch example {
-                    case .modalExample:
-                        self.tabController.selectedIndex = 1
-                    case .stackExample:
-                        self.tabController.selectedIndex = 0
-                    }
+                    self.onTransition(to: context)
                     
                     completion?(self)
                 }
@@ -56,5 +49,23 @@ class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
     func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
         // не случается
         completion?(self)
+    }
+}
+
+extension ExamplesCoordinator: Transitable {
+    static func canTransit(to target: Any) -> Bool {
+        return StackCoordinator.canTransit(to: target) || MainCoordinator.canTransit(to: target)
+    }
+    
+    func performTransition(to: Any) {
+        onTransition(to: to)
+    }
+    
+    func onTransition(to: Any) {
+        if MainCoordinator.canTransit(to: to) {
+            self.tabController.selectedIndex = 1
+        } else if StackCoordinator.canTransit(to: to) {
+            self.tabController.selectedIndex = 0
+        }
     }
 }
