@@ -38,13 +38,13 @@ protocol Coordinator: Component {
 }
 
 /*
- Отображающий компонент - это компонент, который может отобразить
- координаторы. При этом он сам может являться координатором,
+ Отображающий компонент - это компонент, который сам решает, 
+ как отображать дочерние координаторы. При этом он сам может являться координатором,
  но не обязательно.
  */
 protocol PresentingComponent: Component {
-    func present(childCoordinator: Coordinator, context: Any)
-    func dismiss(childCoordinator: Coordinator, context: Any)
+    func presentChild(childCoordinator: Coordinator, context: Any, completion: Callback?)
+    func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?)
 }
 
 typealias PresentingCoordinator = PresentingComponent & Coordinator
@@ -78,25 +78,6 @@ extension Component {
 extension Coordinator {
     var parentCoordinator: Coordinator? {
         return parent as? Coordinator
-    }
-}
-
-extension PresentingComponent {
-    func presentChild(_ coordinator: Coordinator, context: Any = none, completion: Callback? = nil) {
-        startChild(coordinator, context: context) { [weak self] child in
-            self?.present(childCoordinator: coordinator, context: context)
-            completion?(child)
-        }
-    }
-    
-    func dismissChild(identifier: String, context: Any = none, completion: Callback? = nil) {
-        stopChild(identifier: identifier, context: context) { [weak self] child in
-            guard let childCoordinator = child as? Coordinator else {
-                fatalError("\(type(of:self)) tried to dismiss not a Coordinator")
-            }
-            self?.dismiss(childCoordinator: childCoordinator, context: context)
-            completion?(child)
-        }
     }
 }
 

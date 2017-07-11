@@ -27,3 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
+func notImplemented() -> Never {
+    fatalError("Not implemented yet.")
+}

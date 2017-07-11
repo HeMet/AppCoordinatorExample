@@ -26,19 +26,27 @@ class MainCoordinator: CoordinatorProps, Coordinator {
     
     func start(context: Any, completion: Callback?) {
         navigator.presentMaster { masterVC in
+            if let presenter = self.parent as? PresentingComponent {
+                presenter.presentChild(childCoordinator: self, context: context, completion: completion)
+            } else {
+                notImplemented()
+            }
         }
-        completion?(self)
     }
     
     func stop(context: Any, completion: Callback?) {
-        completion?(self)
+        if let presenter = parentCoordinator as? PresentingComponent {
+            presenter.dismissChild(childCoordinator: self, context: context, completion: completion)
+        } else {
+            completion?(self)
+        }
     }
     
     func detailsTapped() {
-//        selectedId = UUID().uuidString
-//        let modal = ModalCoordinator()
-//        startChild(modal, completion: nil)
-        transit(to: ExampleTarget(example: .stackExample, stackItems: 3))
+        selectedId = UUID().uuidString
+        let modal = ModalCoordinator()
+        startChild(modal, completion: nil)
+//        transit(to: ExampleTarget(example: .stackExample, stackItems: 3))
     }
 }
 

@@ -26,7 +26,7 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
     func start(context: Any, completion: Callback?) {
         let child = makeChild(mode: mode)
         
-        presentChild(child) { [weak self] coordinator in
+        startChild(child) { [weak self] coordinator in
             if let `self` = self {
                 completion?(self)
             }
@@ -46,13 +46,14 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         completion?(self)
     }
     
-    func present(childCoordinator: Coordinator, context: Any) {
+    func presentChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
         window.rootViewController = childCoordinator.sceneViewController
         window.makeKeyAndVisible()
+        completion?(self)
     }
     
-    func dismiss(childCoordinator: Coordinator, context: Any) {
-        // ничего
+    func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
+        completion?(self)
     }
 }
 
@@ -68,9 +69,9 @@ extension ApplicationCoordinator: TransitionDispatcher {
         }
         
         let child = children.first!.value
-        dismissChild(identifier: child.identifier) { [unowned self] _ in
+        stopChild(identifier: child.identifier) { [unowned self] _ in
             let child = self.makeChild(mode: exTarget.example)
-            self.presentChild(child, context: target)
+            self.startChild(child, context: target, completion: nil)
         }
     }
 }

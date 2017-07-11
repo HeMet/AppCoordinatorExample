@@ -34,15 +34,26 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         updateColor()
         
         timer = makeTimer()
-        timer.star()
-                
-        completion?(self)
+        
+        if let presenter = parentCoordinator as? PresentingComponent {
+            presenter.presentChild(childCoordinator: self, context: context) { _ in
+                self.timer.star()
+                completion?(self)
+            }
+        } else {
+            notImplemented()
+        }
     }
     
     func stop(context: Any, completion: Callback?) {
-        timer.stop()
-        
-        completion?(self)
+        if let presenter = parentCoordinator as? PresentingComponent {
+            presenter.presentChild(childCoordinator: self, context: context) { _ in
+                self.timer.stop()
+                completion?(self)
+            }
+        } else {
+            notImplemented()
+        }
     }
     
     private func makeTimer() -> Timer {
