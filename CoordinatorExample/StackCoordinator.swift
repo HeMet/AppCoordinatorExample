@@ -70,12 +70,16 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
         stackViewController.stackView.addArrangedSubview(childScene.view)
 
         childScene.didMove(toParentViewController: stackViewController)
+        
+        completion?(self)
     }
     
     func dismissChild(childCoordinator coordinator: Coordinator, context: Any, completion: Callback?) {
         coordinator.sceneViewController.willMove(toParentViewController: nil)
         stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
         coordinator.sceneViewController.removeFromParentViewController()
+        
+        completion?(self)
     }
 }
 
