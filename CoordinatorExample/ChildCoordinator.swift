@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol ChildCoordinatorOutput: class {
     func childCoordinatorAdd(_ sender: ChildCoordinator)
@@ -29,31 +30,25 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         self.colorSeed = colorSeed
     }
     
-    func start(context: Any, completion: Callback?) {
+    func start(context: Any) -> Observable<Component> {
         childViewController.output = self
         updateColor()
         
         timer = makeTimer()
         
-        if let presenter = parentCoordinator as? PresentingComponent {
-            presenter.presentChild(childCoordinator: self, context: context) { _ in
-                self.timer.star()
-                completion?(self)
-            }
-        } else {
-            notImplemented()
-        }
+        return presentByParent(context: context)
+            .do(onNext: {
+                $0.timer.star()
+            })
+            .map { $0 }
     }
     
-    func stop(context: Any, completion: Callback?) {
-        if let presenter = parentCoordinator as? PresentingComponent {
-            presenter.presentChild(childCoordinator: self, context: context) { _ in
-                self.timer.stop()
-                completion?(self)
-            }
-        } else {
-            notImplemented()
-        }
+    func stop(context: Any) -> Observable<Component> {
+        return dismissByParent(context: context)
+            .do(onNext: {
+                $0.timer.stop()
+            })
+            .map { $0 }
     }
     
     private func makeTimer() -> Timer {

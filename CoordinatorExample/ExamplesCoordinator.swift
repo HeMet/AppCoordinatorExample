@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import RxSwift
 
 class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
     fileprivate let tabController = UITabBarController()
@@ -16,39 +17,41 @@ class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
         return tabController
     }
     
-    func start(context: Any, completion: Component.Callback?) {
-        startChild(StackCoordinator(), context: context) { _ in
-            self.startChild(MainCoordinator(), context: context) { _ in
-                guard let presenter = self.parent as? PresentingComponent else {
-                    notImplemented()
-                }
-                
-                presenter.presentChild(childCoordinator: self, context: context) { _ in
-                    self.onTransition(to: context)
-                    
-                    completion?(self)
-                }
+    func start(context: Any) -> Observable<Component> {
+        return Observable.combineLatest(
+                startChild(StackCoordinator(), context: context),
+                startChild(MainCoordinator(), context: context)
+            )
+            .flatMap { _ -> Observable<Component> in
+                self.presentByParent(context: context)
+                    .do(onNext: { this in
+                        this.onTransition(to: context)
+                    })
+                    .map { $0 }
             }
-        }
     }
     
-    func stop(context: Any, completion: Component.Callback?) {
+    func stop(context: Any) -> Observable<Component> {
         guard let presenter = self.parent as? PresentingComponent else {
             notImplemented()
         }
         
-        presenter.dismissChild(childCoordinator: self, context: context, completion: completion)
+        return presenter.dismissChild(self, context: context)
     }
     
-    func presentChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
-        let viewController = (tabController.viewControllers ?? []) + [childCoordinator.sceneViewController]
-        tabController.setViewControllers(viewController, animated:true)
-        completion?(self)
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
+        return Observable.create { observer in
+            let viewController = (self.tabController.viewControllers ?? []) + [childCoordinator.sceneViewController]
+            self.tabController.setViewControllers(viewController, animated:true)
+            observer.onNext(childCoordinator)
+            observer.onCompleted()
+            return Disposables.create()
+        }
     }
     
-    func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
         // не случается
-        completion?(self)
+        return .just(childCoordinator)
     }
 }
 

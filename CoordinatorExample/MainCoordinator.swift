@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 // how to push data from Coordinator to ViewControllers?
 class MainCoordinator: CoordinatorProps, Coordinator {
@@ -24,28 +25,30 @@ class MainCoordinator: CoordinatorProps, Coordinator {
         navigator = MainNavigator(coordinator: self)
     }
     
-    func start(context: Any, completion: Callback?) {
+    func start(context: Any) -> Observable<Component> {
         navigator.presentMaster { masterVC in
-            if let presenter = self.parent as? PresentingComponent {
-                presenter.presentChild(childCoordinator: self, context: context, completion: completion)
-            } else {
-                notImplemented()
-            }
+            
+        }
+        
+        if let presenter = self.parent as? PresentingComponent {
+            return presenter.presentChild(childCoordinator: self, context: context)
+        } else {
+            notImplemented()
         }
     }
     
-    func stop(context: Any, completion: Callback?) {
+    func stop(context: Any) -> Observable<Component> {
         if let presenter = parentCoordinator as? PresentingComponent {
-            presenter.dismissChild(childCoordinator: self, context: context, completion: completion)
+            return presenter.dismissChild(childCoordinator: self, context: context)
         } else {
-            completion?(self)
+            return .just(self)
         }
     }
     
     func detailsTapped() {
         selectedId = UUID().uuidString
         let modal = ModalCoordinator()
-        startChild(modal, completion: nil)
+        startChild(modal, context: none).subscribe()
 //        transit(to: ExampleTarget(example: .stackExample, stackItems: 3))
     }
 }

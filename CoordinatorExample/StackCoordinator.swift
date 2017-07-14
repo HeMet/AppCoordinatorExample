@@ -7,39 +7,29 @@
 //
 
 import UIKit
+import RxSwift
 
 class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
     
-    func start(context: Any, completion: Callback?) {
-        let common = { (completion: Callback?) in
-            if let target = context as? ExampleTarget, target.example == .stackExample {
-                for _ in 0..<max(1, target.stackItems) {
-                    self.addElement()
+    func start(context: Any) -> Observable<Component> {
+        return presentByParent(context: context)
+            .do(onNext: { this in
+                if let target = context as? ExampleTarget, target.example == .stackExample {
+                    for _ in 0..<max(1, target.stackItems) {
+                        this.addElement()
+                    }
+                } else {
+                    this.addElement()
                 }
-            } else {
-                self.addElement()
-            }
-            completion?(self)
-        }
-        
-        if let presenter = parent as? PresentingComponent {
-            presenter.presentChild(childCoordinator: self, context: context) { _ in
-                common(completion)
-            }
-        } else {
-            notImplemented()
-        }
+            })
+            .map { $0 }
     }
     
-    func stop(context: Any, completion: Callback?) {
-        if let presenter = parentCoordinator as? PresentingComponent {
-            presenter.dismissChild(childCoordinator: self, context: context, completion: completion)
-        } else {
-            completion?(self)
-        }
+    func stop(context: Any) -> Observable<Component> {
+        return dismissByParent(context: context).map { $0 }
     }
 
     func addElement() {
@@ -50,7 +40,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
         }
         
         let child = makeChildCoordinator()
-        startChild(child, completion: nil)
+        startChild(child, context: none).subscribe()
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
@@ -60,26 +50,34 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     }
     
     func removeChild(coordinator: Coordinator) {
-        stopChild(identifier: coordinator.identifier, completion: nil)
+        stopChild(identifier: coordinator.identifier, context: none).subscribe()
     }
     
-    func presentChild(childCoordinator coordinator: Coordinator, context: Any, completion: Callback?) {
-        let childScene = coordinator.sceneViewController
-
-        stackViewController.addChildViewController(childScene)
-        stackViewController.stackView.addArrangedSubview(childScene.view)
-
-        childScene.didMove(toParentViewController: stackViewController)
-        
-        completion?(self)
+    func presentChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
+        return .create { observer in
+            let childScene = coordinator.sceneViewController
+            
+            self.stackViewController.addChildViewController(childScene)
+            self.stackViewController.stackView.addArrangedSubview(childScene.view)
+            
+            childScene.didMove(toParentViewController: self.stackViewController)
+            
+            observer.onNext(coordinator)
+            observer.onCompleted()
+            return Disposables.create()
+        }
     }
     
-    func dismissChild(childCoordinator coordinator: Coordinator, context: Any, completion: Callback?) {
-        coordinator.sceneViewController.willMove(toParentViewController: nil)
-        stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
-        coordinator.sceneViewController.removeFromParentViewController()
-        
-        completion?(self)
+    func dismissChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
+        return .create { observer in
+            coordinator.sceneViewController.willMove(toParentViewController: nil)
+            self.stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
+            coordinator.sceneViewController.removeFromParentViewController()
+            
+            observer.onNext(coordinator)
+            observer.onCompleted()
+            return Disposables.create()
+        }
     }
 }
 
@@ -102,7 +100,7 @@ extension StackCoordinator: Transitable {
                     break loop
                 case .orderedAscending:
                     let id = children.values.first!.identifier
-                    stopChild(identifier: id, completion: nil)
+                    stopChild(identifier: id, context: none).subscribe()
                 case .orderedDescending:
                     addElement()
                 }

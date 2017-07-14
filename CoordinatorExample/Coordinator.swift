@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 /*
  Основной блок для организации приложения.
@@ -20,11 +21,13 @@ protocol Component: class {
     weak var parent: Component? { get set }
     var children: [String: Component] { get set }
     
-    func start(context: Any, completion: Callback?)
-    func stop(context: Any, completion: Callback?)
+    // Component is self
+    func start(context: Any) -> Observable<Component>
+    func stop(context: Any) -> Observable<Component>
     
-    func startChild(_ coordinator: Component, context: Any, completion: Callback?)
-    func stopChild(identifier: String, context: Any, completion: Callback?)
+    // Component is child
+    func startChild(_ coordinator: Component, context: Any) -> Observable<Component>
+    func stopChild(identifier: String, context: Any) -> Observable<Component>
     
     func childFinished(identifier: String)
 }
@@ -43,8 +46,8 @@ protocol Coordinator: Component {
  но не обязательно.
  */
 protocol PresentingComponent: Component {
-    func presentChild(childCoordinator: Coordinator, context: Any, completion: Callback?)
-    func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?)
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component>
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component>
 }
 
 typealias PresentingCoordinator = PresentingComponent & Coordinator
@@ -52,26 +55,74 @@ typealias PresentingCoordinator = PresentingComponent & Coordinator
 extension Component {
     var identifier: String { return String(describing: type(of: self)) }
     
-    func startChild(_ coordinator: Component, context: Any = none, completion: Callback?) {
-        children[coordinator.identifier] = coordinator
-        coordinator.parent = self
-        coordinator.start(context: context, completion: completion)
+    func startChild(_ coordinator: Component, context: Any) -> Observable<Component> {
+        return add(child: coordinator)
+            .flatMap { coordiantor in
+                coordiantor.start(context: context)
+            }
     }
     
-    func stopChild(identifier: String, context: Any = none, completion: Callback?) {
+    func stopChild(identifier: String, context: Any) -> Observable<Component> {
         guard let child = children[identifier] else {
             fatalError("Child coordinator with identifier \(identifier) not found.")
         }
         
-        child.stop(context: context) { [weak self] coordinator in
-            coordinator.parent = nil
-            self?.children[identifier] = nil
-            completion?(coordinator)
+        return child
+            .stop(context: context)
+            .flatMap {
+                self.remove(identifier: $0.identifier)
+        }
+    }
+    
+    private func add(child: Component) -> Observable<Component> {
+        return Observable.create { observer in
+            self.children[child.identifier] = child
+            child.parent = self
+            observer.onNext(child)
+            observer.onCompleted()
+            return Disposables.create()
+        }
+    }
+    
+    private func remove(identifier: String) -> Observable<Component> {
+        return Observable.create { observer in
+            guard let child = self.children[identifier] else {
+                fatalError("Child coordinator with identifier \(identifier) not found.")
+            }
+            
+            child.parent = nil
+            self.children[identifier] = nil
+            
+            observer.onNext(child)
+            observer.onCompleted()
+            return Disposables.create()
         }
     }
     
     func childFinished(identifier: String) {
-        stopChild(identifier: identifier, context: none, completion: nil)
+        //stopChild(identifier: identifier, context: none, completion: nil)
+        stopChild(identifier: identifier, context: none).subscribe()
+    }
+}
+
+extension Coordinator {
+    // Component is Self
+    func presentByParent(context: Any) -> Observable<Self> {
+        guard let presenter = parent as? PresentingComponent else {
+            notImplemented()
+        }
+        
+        // TODO
+        return presenter.presentChild(self, context: context).map { _ in self }
+    }
+    
+    func dismissByParent(context: Any) -> Observable<Self> {
+        guard let presenter = parent as? PresentingComponent else {
+            notImplemented()
+        }
+        
+        // TODO
+        return presenter.dismissChild(self, context: context).map { _ in self }
     }
 }
 
@@ -82,3 +133,5 @@ extension Coordinator {
 }
 
 let none: Void = Void()
+
+

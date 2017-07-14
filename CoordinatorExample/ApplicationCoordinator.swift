@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
 
@@ -23,32 +24,31 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         self.mode = mode
     }
     
-    func start(context: Any, completion: Callback?) {
+    func start(context: Any) -> Observable<Component> {
         let child = makeChild(mode: mode)
         
-        startChild(child, context: ExampleTarget(example: mode, stackItems: 3, showModalScreen: false)) { [weak self] coordinator in
-            if let `self` = self {
-                completion?(self)
-            }
-        }
+        return startChild(child, context: ExampleTarget(example: mode, stackItems: 3, showModalScreen: false))
+            .map { _ in self }
     }
     
     func makeChild(mode: Mode) -> Coordinator {
         return ExamplesCoordinator()
     }
     
-    func stop(context: Any, completion: Callback?) {
-        completion?(self)
+    func stop(context: Any) -> Observable<Component> {
+        return .just(self)
     }
     
-    func presentChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
-        window.rootViewController = childCoordinator.sceneViewController
-        window.makeKeyAndVisible()
-        completion?(self)
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
+        return .perform {
+            self.window.rootViewController = childCoordinator.sceneViewController
+            self.window.makeKeyAndVisible()
+            return self
+        }
     }
     
-    func dismissChild(childCoordinator: Coordinator, context: Any, completion: Callback?) {
-        completion?(self)
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
+        return .just(self)
     }
 }
 
@@ -63,11 +63,13 @@ extension ApplicationCoordinator: TransitionDispatcher {
             return
         }
         
-        let child = children.first!.value
-        stopChild(identifier: child.identifier) { [unowned self] _ in
-            let child = self.makeChild(mode: exTarget.example)
-            self.startChild(child, context: target, completion: nil)
-        }
+        let _child = children.first!.value
+        stopChild(identifier: _child.identifier, context: none)
+            .flatMap { [unowned self] _ -> Observable<Component> in
+                let newChild = self.makeChild(mode: exTarget.example)
+                return self.startChild(newChild, context: target)
+            }
+            .subscribe()
     }
 }
 

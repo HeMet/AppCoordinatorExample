@@ -7,34 +7,32 @@
 //
 
 import UIKit
+import RxSwift
 
 class ModalCoordinator: CoordinatorProps, Coordinator {
     
     let sceneViewController = UIViewController()
     
-    func start(context: Any, completion: Callback?) {
+    func start(context: Any) -> Observable<Component> {
         guard let parent = parentCoordinator else {
-            completion?(self)
-            return
+            return .just(self)
         }
-        parent.sceneViewController.present(sceneViewController, animated: true) { [weak self] in
-            if let `self` = self {
-                completion?(self)
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                if let `self` = self {
-                    self.parent?.childFinished(identifier: self.identifier)
-                }
+        return parent.sceneViewController.rx
+            .present(sceneViewController, animated: true)
+            .map { self }
+            .do(onNext: { component in
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
+                    component.parent?.childFinished(identifier: self.identifier)
+                })
             })
-        }
     }
     
-    func stop(context: Any, completion: Callback?) {
-        parentCoordinator?.sceneViewController.dismiss(animated: true) { [weak self] in
-            if let `self` = self {
-                completion?(self)
-            }
+    func stop(context: Any) -> Observable<Component>  {
+        guard let parent = parentCoordinator else {
+            return .just(self)
         }
+        return parent.sceneViewController.rx
+            .dismiss(animated: true)
+            .map { self }
     }
 }
