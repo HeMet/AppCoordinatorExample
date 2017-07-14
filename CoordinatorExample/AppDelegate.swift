@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -21,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = wnd
         
         appCoordinator = ApplicationCoordinator(window: wnd, mode: .stackExample)
-        appCoordinator.start(context: none, completion: nil)
+        appCoordinator.start(context: none).subscribe()
         
         return true
     }

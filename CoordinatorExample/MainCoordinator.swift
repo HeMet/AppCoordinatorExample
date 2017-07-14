@@ -31,7 +31,7 @@ class MainCoordinator: CoordinatorProps, Coordinator {
         }
         
         if let presenter = self.parent as? PresentingComponent {
-            return presenter.presentChild(childCoordinator: self, context: context)
+            return presenter.presentChild(self, context: context)
         } else {
             notImplemented()
         }
@@ -39,7 +39,7 @@ class MainCoordinator: CoordinatorProps, Coordinator {
     
     func stop(context: Any) -> Observable<Component> {
         if let presenter = parentCoordinator as? PresentingComponent {
-            return presenter.dismissChild(childCoordinator: self, context: context)
+            return presenter.dismissChild(self, context: context)
         } else {
             return .just(self)
         }
