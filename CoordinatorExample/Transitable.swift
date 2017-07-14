@@ -17,16 +17,6 @@ protocol Transitable {
     static func canTransit(to: Any) -> Bool
 }
 
-//extension Transitable {
-//    func transit(to: Any) {
-//        
-//    }
-//    
-//    static func canTransit(to: Any) {
-//        return false
-//    }
-//}
-
 extension Component {
     func transit(to target: Any) {
         if let rootTransitable = rootComponent as? TransitionDispatcher {
