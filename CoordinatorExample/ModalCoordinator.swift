@@ -13,26 +13,24 @@ class ModalCoordinator: CoordinatorProps, Coordinator {
     
     let sceneViewController = UIViewController()
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         guard let parent = parentCoordinator else {
-            return .just(self)
+            return .just()
         }
         return parent.sceneViewController.rx
             .present(sceneViewController, animated: true)
-            .map { self }
-            .do(onNext: { component in
+            .do(onNext: { [unowned self] in
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                    component.parent?.childFinished(identifier: self.identifier)
+                    self.parent?.stopChild(self, context: none).subscribe()
                 })
             })
     }
     
-    func stop(context: Any) -> Observable<Component>  {
+    func stop(context: Any) -> Observable<Void>  {
         guard let parent = parentCoordinator else {
-            return .just(self)
+            return .just()
         }
         return parent.sceneViewController.rx
             .dismiss(animated: true)
-            .map { self }
     }
 }

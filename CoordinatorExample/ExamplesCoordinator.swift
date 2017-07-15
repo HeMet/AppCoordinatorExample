@@ -17,26 +17,25 @@ class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
         return tabController
     }
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         return Observable.combineLatest(
                 startChild(StackCoordinator(), context: context),
                 startChild(MainCoordinator(), context: context)
             )
-            .flatMap { _ -> Observable<Component> in
+            .flatMap { _ -> Observable<Void> in
                 self.presentByParent(context: context)
-                    .do(onNext: { this in
-                        this.onTransition(to: context)
+                    .do(onNext: { [unowned self] in
+                        self.onTransition(to: context)
                     })
-                    .map { $0 }
             }
     }
     
-    func stop(context: Any) -> Observable<Component> {
+    func stop(context: Any) -> Observable<Void> {
         guard let presenter = self.parent as? PresentingComponent else {
             notImplemented()
         }
         
-        return presenter.dismissChild(self, context: context)
+        return presenter.dismissChild(self, context: context).map { _ in Void() }
     }
     
     func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {

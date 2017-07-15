@@ -30,25 +30,23 @@ class ChildCoordinator: CoordinatorProps, Coordinator {
         self.colorSeed = colorSeed
     }
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         childViewController.output = self
         updateColor()
         
         timer = makeTimer()
         
         return presentByParent(context: context)
-            .do(onNext: {
-                $0.timer.star()
+            .do(onNext: { [unowned self] in
+                self.timer.star()
             })
-            .map { $0 }
     }
     
-    func stop(context: Any) -> Observable<Component> {
+    func stop(context: Any) -> Observable<Void> {
         return dismissByParent(context: context)
-            .do(onNext: {
-                $0.timer.stop()
+            .do(onNext: { [unowned self] in
+                self.timer.stop()
             })
-            .map { $0 }
     }
     
     private func makeTimer() -> Timer {

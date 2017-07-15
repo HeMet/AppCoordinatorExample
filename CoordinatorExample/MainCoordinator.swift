@@ -25,24 +25,16 @@ class MainCoordinator: CoordinatorProps, Coordinator {
         navigator = MainNavigator(coordinator: self)
     }
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         navigator.presentMaster { masterVC in
             
         }
         
-        if let presenter = self.parent as? PresentingComponent {
-            return presenter.presentChild(self, context: context)
-        } else {
-            notImplemented()
-        }
+        return presentByParent(context: context)
     }
     
-    func stop(context: Any) -> Observable<Component> {
-        if let presenter = parentCoordinator as? PresentingComponent {
-            return presenter.dismissChild(self, context: context)
-        } else {
-            return .just(self)
-        }
+    func stop(context: Any) -> Observable<Void> {
+        return dismissByParent(context: context)
     }
     
     func detailsTapped() {

@@ -24,19 +24,19 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         self.mode = mode
     }
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         let child = makeChild(mode: mode)
         
         return startChild(child, context: ExampleTarget(example: mode, stackItems: 3, showModalScreen: false))
-            .map { _ in self }
+            .map { _ in Void() }
     }
     
-    func makeChild(mode: Mode) -> Coordinator {
+    func makeChild(mode: Mode) -> ExamplesCoordinator {
         return ExamplesCoordinator()
     }
     
-    func stop(context: Any) -> Observable<Component> {
-        return .just(self)
+    func stop(context: Any) -> Observable<Void> {
+        return .just()
     }
     
     func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
@@ -64,8 +64,8 @@ extension ApplicationCoordinator: TransitionDispatcher {
         }
         
         let _child = children.first!.value
-        stopChild(identifier: _child.identifier, context: none)
-            .flatMap { [unowned self] _ -> Observable<Component> in
+        stopAnyChild(_child, context: none)
+            .flatMap { [unowned self] _ -> Observable<ExamplesCoordinator> in
                 let newChild = self.makeChild(mode: exTarget.example)
                 return self.startChild(newChild, context: target)
             }

@@ -14,22 +14,21 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
     
-    func start(context: Any) -> Observable<Component> {
+    func start(context: Any) -> Observable<Void> {
         return presentByParent(context: context)
-            .do(onNext: { this in
+            .do(onNext: { [unowned self] in
                 if let target = context as? ExampleTarget, target.example == .stackExample {
                     for _ in 0..<max(1, target.stackItems) {
-                        this.addElement()
+                        self.addElement()
                     }
                 } else {
-                    this.addElement()
+                    self.addElement()
                 }
             })
-            .map { $0 }
     }
     
-    func stop(context: Any) -> Observable<Component> {
-        return dismissByParent(context: context).map { $0 }
+    func stop(context: Any) -> Observable<Void> {
+        return dismissByParent(context: context)
     }
 
     func addElement() {
@@ -50,7 +49,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     }
     
     func removeChild(coordinator: Coordinator) {
-        stopChild(identifier: coordinator.identifier, context: none).subscribe()
+        stopAnyChild(coordinator, context: none).subscribe()
     }
     
     func presentChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
@@ -99,8 +98,8 @@ extension StackCoordinator: Transitable {
                 case .orderedSame:
                     break loop
                 case .orderedAscending:
-                    let id = children.values.first!.identifier
-                    stopChild(identifier: id, context: none).subscribe()
+                    let child = children.values.first!
+                    stopAnyChild(child, context: none).subscribe()
                 case .orderedDescending:
                     addElement()
                 }
