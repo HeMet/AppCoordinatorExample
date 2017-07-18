@@ -19,30 +19,35 @@ class StackCoordinator: PresentingCoordinator {
     
     func start(context: Any) -> Observable<Void> {
         return presentByParent(context: context)
-            .do(onNext: { [unowned self] in
+            .map {
                 if let target = context as? ExampleTarget, target.example == .stackExample {
-                    for _ in 0..<max(1, target.stackItems) {
-                        self.addElement()
-                    }
+                    return max(1, target.stackItems)
                 } else {
-                    self.addElement()
+                    return 1
                 }
-            })
+            }
+            .flatMap { count -> Observable<Void> in
+                self.addElement().repeat(count)
+            }
     }
     
     func stop(context: Any) -> Observable<Void> {
         return dismissByParent(context: context)
     }
-
-    func addElement() {
+    
+    func addElement() -> Observable<Void> {
         guard _children.items.count < 3 else {
-            let target = ExampleTarget(example: .modalExample, stackItems: 1, showModalScreen: true)
-            transit(to: target)
-            return
+            return .perform { [unowned self] in
+                let target = ExampleTarget(example: .modalExample, stackItems: 1, showModalScreen: true)
+                self.transit(to: target)
+            }
         }
         
-        let child = makeChildCoordinator()
-        startChild(child, context: none).subscribe()
+        return Observable<Void>
+            .perform { self.makeChildCoordinator() }
+            .flatMap { child in
+                self.startChild(child, context: none)
+            }
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
@@ -130,5 +135,14 @@ extension Int {
             return .orderedDescending
         }
         return .orderedAscending
+    }
+}
+
+extension ObservableType {
+    func `repeat`(_ count: Int) -> Observable<E> {
+        return Observable
+            .from(0..<count)
+            .debug("repeat")
+            .flatMap { _ in self }
     }
 }
