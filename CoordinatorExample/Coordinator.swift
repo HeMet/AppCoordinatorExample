@@ -19,7 +19,7 @@ protocol Component: class {
     var identifier: String { get }
     
     weak var parent: Component? { get set }
-    var children: [String: Component] { get set }
+    var children: ChildrenTracker { get }
     
     // Component is self
     func start(context: Any) -> Observable<Void>
@@ -28,7 +28,14 @@ protocol Component: class {
     // Component is child
     func startChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T>
     func stopChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T>
-    func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component>
+    //func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component>
+}
+
+protocol ChildrenTracker {
+    var all: [Component] { get }
+    
+    func insert(_ child: Component)
+    func remove(_ child: Component)
 }
 
 /*
@@ -65,7 +72,7 @@ extension Component {
         return stopAnyChild(coordinator, context: context).map { $0 as! T }
     }
     
-    func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component> {
+    private func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component> {
         guard coordinator.parent === self else {
             fatalError("Child coordinator with identifier \(identifier) not found.")
         }
@@ -73,32 +80,23 @@ extension Component {
         return coordinator
             .stop(context: context)
             .flatMap {
-                self.remove(identifier: coordinator.identifier)
+                self._remove(child: coordinator)
             }
     }
     
     private func add(child: Component) -> Observable<Component> {
-        return Observable.create { observer in
-            self.children[child.identifier] = child
+        return Observable<Component>.perform {
+            self.children.insert(child)
             child.parent = self
-            observer.onNext(child)
-            observer.onCompleted()
-            return Disposables.create()
+            return child
         }
     }
     
-    private func remove(identifier: String) -> Observable<Component> {
-        return Observable.create { observer in
-            guard let child = self.children[identifier] else {
-                fatalError("Child coordinator with identifier \(identifier) not found.")
-            }
-            
+    private func _remove(child: Component) -> Observable<Component> {
+        return Observable<Component>.perform {
             child.parent = nil
-            self.children[identifier] = nil
-            
-            observer.onNext(child)
-            observer.onCompleted()
-            return Disposables.create()
+            self.children.remove(child)
+            return child
         }
     }
 }

@@ -38,7 +38,7 @@ extension Component {
 extension TransitionDispatcher where Self: Component {
     typealias TransitableComponent = Component & Transitable
     func childFor(target: Any) -> TransitableComponent? {
-        let child = children.values.first {
+        let child = children.all.first {
             if let transitable = $0 as? Transitable, type(of: transitable).canTransit(to: target) {
                 return true
             }

@@ -63,7 +63,7 @@ extension ApplicationCoordinator: TransitionDispatcher {
             return
         }
         
-        let _child = children.first!.value
+        let _child = children.all.first!
         stopAnyChild(_child, context: none)
             .flatMap { [unowned self] _ -> Observable<ExamplesCoordinator> in
                 let newChild = self.makeChild(mode: exTarget.example)

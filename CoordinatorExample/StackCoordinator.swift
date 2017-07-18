@@ -9,7 +9,10 @@
 import UIKit
 import RxSwift
 
-class StackCoordinator: CoordinatorProps, PresentingCoordinator {
+class StackCoordinator: PresentingCoordinator {
+    weak var parent: Component?
+    var children: ChildrenTracker { return _children }
+    fileprivate let _children = ChildrenArrayOf<ChildCoordinator>()
     
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
@@ -32,7 +35,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     }
 
     func addElement() {
-        guard children.count < 3 else {
+        guard _children.items.count < 3 else {
             let target = ExampleTarget(example: .modalExample, stackItems: 1, showModalScreen: true)
             transit(to: target)
             return
@@ -43,13 +46,9 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
-        let child = ChildCoordinator(colorSeed: children.count)
+        let child = ChildCoordinator(colorSeed: _children.items.count)
         child.output = self
         return child
-    }
-    
-    func removeChild(coordinator: Coordinator) {
-        stopAnyChild(coordinator, context: none).subscribe()
     }
     
     func presentChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
@@ -86,7 +85,7 @@ extension StackCoordinator: ChildCoordinatorOutput {
     }
     
     func childCoordinatorRemove(_ sender: ChildCoordinator) {
-        removeChild(coordinator: sender)
+        stopChild(sender, context: none).subscribe()
     }
 }
 
@@ -94,12 +93,12 @@ extension StackCoordinator: Transitable {
     func performTransition(to target: Any) {
         if let target = target as? ExampleTarget, target.example == .stackExample {
             loop: while true {
-                switch children.count.compare(target.stackItems) {
+                switch _children.items.count.compare(target.stackItems) {
                 case .orderedSame:
                     break loop
                 case .orderedAscending:
-                    let child = children.values.first!
-                    stopAnyChild(child, context: none).subscribe()
+                    let child = _children.items.first!
+                    stopChild(child, context: none).subscribe()
                 case .orderedDescending:
                     addElement()
                 }
