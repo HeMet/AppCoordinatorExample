@@ -51,30 +51,22 @@ class StackCoordinator: PresentingCoordinator {
         return child
     }
     
-    func presentChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
-        return .create { observer in
+    func presentChild(_ coordinator: Coordinator, context: Any) -> Observable<Void> {
+        return .perform {
             let childScene = coordinator.sceneViewController
             
             self.stackViewController.addChildViewController(childScene)
             self.stackViewController.stackView.addArrangedSubview(childScene.view)
             
             childScene.didMove(toParentViewController: self.stackViewController)
-            
-            observer.onNext(coordinator)
-            observer.onCompleted()
-            return Disposables.create()
         }
     }
     
-    func dismissChild(_ coordinator: Coordinator, context: Any) -> Observable<Component> {
-        return .create { observer in
+    func dismissChild(_ coordinator: Coordinator, context: Any) -> Observable<Void> {
+        return .perform {
             coordinator.sceneViewController.willMove(toParentViewController: nil)
             self.stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
             coordinator.sceneViewController.removeFromParentViewController()
-            
-            observer.onNext(coordinator)
-            observer.onCompleted()
-            return Disposables.create()
         }
     }
 }

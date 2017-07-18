@@ -35,22 +35,19 @@ class ExamplesCoordinator: CoordinatorProps, PresentingCoordinator {
             notImplemented()
         }
         
-        return presenter.dismissChild(self, context: context).map { _ in Void() }
+        return presenter.dismissChild(self, context: context)
     }
     
-    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
-        return Observable.create { observer in
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void> {
+        return .perform {
             let viewController = (self.tabController.viewControllers ?? []) + [childCoordinator.sceneViewController]
             self.tabController.setViewControllers(viewController, animated:true)
-            observer.onNext(childCoordinator)
-            observer.onCompleted()
-            return Disposables.create()
         }
     }
     
-    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void> {
         // не случается
-        return .just(childCoordinator)
+        return .just()
     }
 }
 

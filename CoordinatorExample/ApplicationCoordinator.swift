@@ -28,7 +28,6 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         let child = makeChild(mode: mode)
         
         return startChild(child, context: ExampleTarget(example: mode, stackItems: 3, showModalScreen: false))
-            .map { _ in Void() }
     }
     
     func makeChild(mode: Mode) -> ExamplesCoordinator {
@@ -39,16 +38,15 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
         return .just()
     }
     
-    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void> {
         return .perform {
             self.window.rootViewController = childCoordinator.sceneViewController
             self.window.makeKeyAndVisible()
-            return self
         }
     }
     
-    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component> {
-        return .just(self)
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void> {
+        return .just()
     }
 }
 
@@ -64,8 +62,8 @@ extension ApplicationCoordinator: TransitionDispatcher {
         }
         
         let _child = children.all.first!
-        stopAnyChild(_child, context: none)
-            .flatMap { [unowned self] _ -> Observable<ExamplesCoordinator> in
+        stopChild(_child, context: none)
+            .flatMap { [unowned self] _ -> Observable<Void> in
                 let newChild = self.makeChild(mode: exTarget.example)
                 return self.startChild(newChild, context: target)
             }

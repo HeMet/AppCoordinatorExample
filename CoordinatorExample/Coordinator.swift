@@ -26,9 +26,8 @@ protocol Component: class {
     func stop(context: Any) -> Observable<Void>
     
     // Component is child
-    func startChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T>
-    func stopChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T>
-    //func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component>
+    func startChild(_ coordinator: Component, context: Any) -> Observable<Void>
+    func stopChild(_ coordinator: Component, context: Any) -> Observable<Void>
 }
 
 protocol ChildrenTracker {
@@ -52,8 +51,8 @@ protocol Coordinator: Component {
  но не обязательно.
  */
 protocol PresentingComponent: Component {
-    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component>
-    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Component>
+    func presentChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void>
+    func dismissChild(_ childCoordinator: Coordinator, context: Any) -> Observable<Void>
 }
 
 typealias PresentingCoordinator = PresentingComponent & Coordinator
@@ -61,18 +60,14 @@ typealias PresentingCoordinator = PresentingComponent & Coordinator
 extension Component {
     var identifier: String { return String(describing: type(of: self)) }
     
-    func startChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T> {
+    func startChild(_ coordinator: Component, context: Any) -> Observable<Void> {
         return add(child: coordinator)
-            .flatMap { coordiantor in
-                coordiantor.start(context: context).map { coordinator }
+            .flatMap {
+                coordinator.start(context: context)
             }
     }
     
-    func stopChild<T: Component>(_ coordinator: T, context: Any) -> Observable<T> {
-        return stopAnyChild(coordinator, context: context).map { $0 as! T }
-    }
-    
-    private func stopAnyChild(_ coordinator: Component, context: Any) -> Observable<Component> {
+    func stopChild(_ coordinator: Component, context: Any) -> Observable<Void> {
         guard coordinator.parent === self else {
             fatalError("Child coordinator with identifier \(identifier) not found.")
         }
@@ -84,19 +79,17 @@ extension Component {
             }
     }
     
-    private func add(child: Component) -> Observable<Component> {
-        return Observable<Component>.perform {
+    private func add(child: Component) -> Observable<Void> {
+        return .perform {
             self.children.insert(child)
             child.parent = self
-            return child
         }
     }
     
-    private func _remove(child: Component) -> Observable<Component> {
-        return Observable<Component>.perform {
+    private func _remove(child: Component) -> Observable<Void> {
+        return .perform {
             child.parent = nil
             self.children.remove(child)
-            return child
         }
     }
 }
@@ -108,8 +101,7 @@ extension Coordinator {
             notImplemented()
         }
         
-        // TODO
-        return presenter.presentChild(self, context: context).map { _ in Void() }
+        return presenter.presentChild(self, context: context)
     }
     
     func dismissByParent(context: Any) -> Observable<Void> {
@@ -117,8 +109,7 @@ extension Coordinator {
             notImplemented()
         }
         
-        // TODO
-        return presenter.dismissChild(self, context: context).map { _ in Void() }
+        return presenter.dismissChild(self, context: context)
     }
 }
 
