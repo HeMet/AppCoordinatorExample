@@ -20,7 +20,7 @@ class Timer {
     
     func star() {
         let t = DispatchSource.makeTimerSource()
-        t.scheduleRepeating(deadline: .now() + interval, interval: interval)
+        t.schedule(deadline: .now() + interval, repeating: interval)
         t.setEventHandler(handler: action)
         timer = t
         t.resume()

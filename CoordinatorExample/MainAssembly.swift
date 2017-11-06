@@ -33,7 +33,7 @@ class MasterViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Detail", style: .plain, target: self, action: #selector(detailsTapped))
     }
     
-    func detailsTapped() {
+    @objc func detailsTapped() {
         coordinator.detailsTapped()
     }
 }

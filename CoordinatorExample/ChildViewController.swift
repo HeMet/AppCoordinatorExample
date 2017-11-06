@@ -41,11 +41,11 @@ class ChildViewController: UIViewController, ChildViewControllerInput {
         }
     }
     
-    func tapped() {
+    @objc func tapped() {
         output?.childViewControllerTapped(self)
     }
     
-    func swiped() {
+    @objc func swiped() {
         output?.childViewControllerSwiped(self)
     }
 }
