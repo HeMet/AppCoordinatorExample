@@ -31,6 +31,7 @@ class ComponentRegistry<Destination> where Destination: DestinationType {
     
     var items: [Item] = []
     
+    @discardableResult
     func register(_ componentType: CreatableComponent.Type, destination: Destination) -> ComponentRegistry {
         items.append(Item(destination: destination,
                           factory: { componentType.init(parameters: $0) }))
@@ -44,7 +45,6 @@ class ComponentRegistry<Destination> where Destination: DestinationType {
         return self
     }
     
-    @discardableResult
     func component(for destination: Destination, parameters: Any?) -> Component? {
         return items
             .first(where: { $0.destination == destination })?
