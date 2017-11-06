@@ -24,15 +24,12 @@ class ApplicationCoordinator: CoordinatorProps, Component {
     }
     
     func start(completion: Callback?) {
-        let child: Component
         switch mode {
         case .modalExample:
-            child = travel(to: .main)
+            travel(to: .main)
         case .stackExample:
-            child = travel(to: .stack)
+            travel(to: .stack)
         }
-        
-        self.connect(child, context: 0, completion: nil)
     }
     
     func stop(completion: Callback?) {

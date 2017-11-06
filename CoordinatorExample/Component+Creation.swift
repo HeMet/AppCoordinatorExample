@@ -54,9 +54,10 @@ class ComponentRegistry<Destination> where Destination: DestinationType {
 
 let sharedComponentRegistry = ComponentRegistry<Destination>()
 
-extension Component {
-    /// temporary
-    func travel(to destination: Destination, context: Any? = nil) -> Component {
-        return sharedComponentRegistry.component(for: destination, parameters: context)!
+extension Component {    
+    func travel(to destination: Destination, context: Any? = nil, completion: (() -> Void)? = nil) {
+        let result = sharedComponentRegistry.component(for: destination, parameters: context)!
+        connectingChildComponent(result)
+        connect(result, context: context, completion: completion)
     }
 }

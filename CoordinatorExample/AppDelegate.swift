@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let wnd = UIWindow(frame: UIScreen.main.bounds)
         window = wnd
         
-        appCoordinator = ApplicationCoordinator(window: wnd, mode: .stackExample)
+        appCoordinator = ApplicationCoordinator(window: wnd, mode: .modalExample)
         appCoordinator.start(completion: nil)
         
         return true

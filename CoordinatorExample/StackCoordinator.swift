@@ -27,18 +27,16 @@ class StackCoordinator: CoordinatorProps, Coordinator, CreatableComponent {
     }
 
     func addElement() {
-        let child = makeChildCoordinator()
-        connect(child, context: 0, completion: nil)
-    }
-    
-    func makeChildCoordinator() -> ChildCoordinator {
-        let child = travel(to: .child, context: children.count) as! ChildCoordinator
-        child.output = self
-        return child
+        travel(to: .child, context: children.count)
     }
     
     func removeChild(coordinator: Coordinator) {
         disconnect(coordinator, context: 0, completion: nil)
+    }
+    
+    func connectingChildComponent(_ component: Component) {
+        let child = component as! ChildCoordinator
+        child.output = self
     }
 }
 

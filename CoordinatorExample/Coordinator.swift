@@ -27,6 +27,8 @@ protocol Component: class {
     func stopChild(identifier: String, completion: Callback?)
     
     func childFinished(identifier: String)
+    
+    func connectingChildComponent(_ component: Component)
 }
 
 /*
@@ -61,6 +63,8 @@ extension Component {
     func childFinished(identifier: String) {
         stopChild(identifier: identifier, completion: nil)
     }
+    
+    func connectingChildComponent(_ component: Component) { }
 }
 
 extension Coordinator {
