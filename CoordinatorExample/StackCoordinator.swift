@@ -8,10 +8,14 @@
 
 import UIKit
 
-class StackCoordinator: CoordinatorProps, Coordinator {
+class StackCoordinator: CoordinatorProps, Coordinator, CreatableComponent {
     
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
+    
+    required init(parameters: Any?) {
+        super.init()
+    }
     
     func start(completion: Callback?) {
         addElement()
@@ -28,7 +32,7 @@ class StackCoordinator: CoordinatorProps, Coordinator {
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
-        let child = ChildCoordinator(colorSeed: children.count)
+        let child = travel(to: .child, context: children.count) as! ChildCoordinator
         child.output = self
         return child
     }

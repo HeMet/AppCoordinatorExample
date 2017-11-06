@@ -36,8 +36,7 @@ class MainCoordinator: CoordinatorProps, Coordinator {
     
     func detailsTapped() {
         selectedId = UUID().uuidString
-        let modal = ModalCoordinator()
-        //startChild(modal, completion: nil)
+        let modal = travel(to: .modal)
         connect(modal, context: 0, completion: nil)
     }
 }

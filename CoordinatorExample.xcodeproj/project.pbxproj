@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		847712021FAF6D930079A1CE /* NavigationDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847712011FAF6D930079A1CE /* NavigationDefinitions.swift */; };
+		847712041FB068F70079A1CE /* Component+Creation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847712031FB068F70079A1CE /* Component+Creation.swift */; };
+		847712061FB075400079A1CE /* Component+Registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847712051FB075400079A1CE /* Component+Registration.swift */; };
 		84D428D91EABD53800F7EC3E /* StackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428D81EABD53800F7EC3E /* StackCoordinator.swift */; };
 		84D428DB1EAC8FD700F7EC3E /* ChildCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428DA1EAC8FD700F7EC3E /* ChildCoordinator.swift */; };
 		84D428DD1EACA4B700F7EC3E /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D428DC1EACA4B700F7EC3E /* Timer.swift */; };
@@ -27,6 +29,8 @@
 
 /* Begin PBXFileReference section */
 		847712011FAF6D930079A1CE /* NavigationDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDefinitions.swift; sourceTree = "<group>"; };
+		847712031FB068F70079A1CE /* Component+Creation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Component+Creation.swift"; sourceTree = "<group>"; };
+		847712051FB075400079A1CE /* Component+Registration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Component+Registration.swift"; sourceTree = "<group>"; };
 		84D428D81EABD53800F7EC3E /* StackCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackCoordinator.swift; sourceTree = "<group>"; };
 		84D428DA1EAC8FD700F7EC3E /* ChildCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChildCoordinator.swift; sourceTree = "<group>"; };
 		84D428DC1EACA4B700F7EC3E /* Timer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
@@ -123,6 +127,8 @@
 				84DCECC11E7548BB0094B64C /* Info.plist */,
 				84D85A311FAF49F100D2F6CA /* Navigation.swift */,
 				847712011FAF6D930079A1CE /* NavigationDefinitions.swift */,
+				847712031FB068F70079A1CE /* Component+Creation.swift */,
+				847712051FB075400079A1CE /* Component+Registration.swift */,
 			);
 			path = CoordinatorExample;
 			sourceTree = "<group>";
@@ -217,6 +223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				847712061FB075400079A1CE /* Component+Registration.swift in Sources */,
 				84D428E11EACA50E00F7EC3E /* ChildViewController.swift in Sources */,
 				84DCECD11EA925F60094B64C /* MainNavigator.swift in Sources */,
 				84DCECD31EA930540094B64C /* MainAssembly.swift in Sources */,
@@ -227,6 +234,7 @@
 				84DCECB61E7548BB0094B64C /* AppDelegate.swift in Sources */,
 				84DCECC81E7548CB0094B64C /* Coordinator.swift in Sources */,
 				84D85A321FAF49F100D2F6CA /* Navigation.swift in Sources */,
+				847712041FB068F70079A1CE /* Component+Creation.swift in Sources */,
 				847712021FAF6D930079A1CE /* NavigationDefinitions.swift in Sources */,
 				84D428DB1EAC8FD700F7EC3E /* ChildCoordinator.swift in Sources */,
 				84DCECD71EAA73DE0094B64C /* ModalCoordinator.swift in Sources */,
