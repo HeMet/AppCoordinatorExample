@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StackCoordinator: CoordinatorProps, PresentingCoordinator {
+class StackCoordinator: CoordinatorProps, Coordinator {
     
     var sceneViewController: UIViewController { return stackViewController }
     let stackViewController = StackViewController()
@@ -24,7 +24,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
 
     func addElement() {
         let child = makeChildCoordinator()
-        presentChild(child)
+        connect(child, context: 0, completion: nil)
     }
     
     func makeChildCoordinator() -> ChildCoordinator {
@@ -34,22 +34,7 @@ class StackCoordinator: CoordinatorProps, PresentingCoordinator {
     }
     
     func removeChild(coordinator: Coordinator) {
-        dismissChild(identifier: coordinator.identifier)
-    }
-    
-    func present(childCoordinator coordinator: Coordinator) {
-        let childScene = coordinator.sceneViewController
-
-        stackViewController.addChildViewController(childScene)
-        stackViewController.stackView.addArrangedSubview(childScene.view)
-
-        childScene.didMove(toParentViewController: stackViewController)
-    }
-    
-    func dismiss(childCoordinator coordinator: Coordinator) {
-        coordinator.sceneViewController.willMove(toParentViewController: nil)
-        stackViewController.stackView.removeArrangedSubview(coordinator.sceneViewController.view)
-        coordinator.sceneViewController.removeFromParentViewController()
+        disconnect(coordinator, context: 0, completion: nil)
     }
 }
 
@@ -75,5 +60,17 @@ class StackViewController: UIViewController {
         _view.axis = .vertical
         _view.distribution = .fillEqually
         view = _view
+    }
+    
+    func addArrangedViewController(_ viewController: UIViewController) {
+        addChildViewController(viewController)
+        stackView.addArrangedSubview(viewController.view)
+        viewController.didMove(toParentViewController: self)
+    }
+    
+    func removeArrangedViewController(_ viewController: UIViewController) {
+        viewController.willMove(toParentViewController: nil)
+        stackView.removeArrangedSubview(viewController.view)
+        viewController.removeFromParentViewController()
     }
 }

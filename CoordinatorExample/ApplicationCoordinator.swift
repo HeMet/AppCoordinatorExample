@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
+class ApplicationCoordinator: CoordinatorProps, Component {
 
     enum Mode {
         case modalExample
@@ -32,23 +32,10 @@ class ApplicationCoordinator: CoordinatorProps, PresentingComponent {
             child = StackCoordinator()
         }
         
-        presentChild(child) { [weak self] coordinator in
-            if let `self` = self {
-                completion?(self)
-            }
-        }
+        self.connect(child, context: 0, completion: nil)
     }
     
     func stop(completion: Callback?) {
         completion?(self)
-    }
-    
-    func present(childCoordinator: Coordinator) {
-        window.rootViewController = childCoordinator.sceneViewController
-        window.makeKeyAndVisible()
-    }
-    
-    func dismiss(childCoordinator: Coordinator) {
-        // ничего
     }
 }

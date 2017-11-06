@@ -37,18 +37,6 @@ protocol Coordinator: Component {
     var sceneViewController: UIViewController { get }
 }
 
-/*
- Отображающий компонент - это компонент, который может отобразить
- координаторы. При этом он сам может являться координатором,
- но не обязательно.
- */
-protocol PresentingComponent: Component {
-    func present(childCoordinator: Coordinator)
-    func dismiss(childCoordinator: Coordinator)
-}
-
-typealias PresentingCoordinator = PresentingComponent & Coordinator
-
 extension Component {
     var identifier: String { return String(describing: type(of: self)) }
     
@@ -78,24 +66,5 @@ extension Component {
 extension Coordinator {
     var parentCoordinator: Coordinator? {
         return parent as? Coordinator
-    }
-}
-
-extension PresentingComponent {
-    func presentChild(_ coordinator: Coordinator, completion: Callback? = nil) {
-        startChild(coordinator) { [weak self] child in
-            self?.present(childCoordinator: coordinator)
-            completion?(child)
-        }
-    }
-    
-    func dismissChild(identifier: String, completion: Callback? = nil) {
-        stopChild(identifier: identifier) { [weak self] child in
-            guard let childCoordinator = child as? Coordinator else {
-                fatalError("\(type(of:self)) tried to dismiss not a Coordinator")
-            }
-            self?.dismiss(childCoordinator: childCoordinator)
-            completion?(child)
-        }
     }
 }

@@ -13,24 +13,17 @@ class ModalCoordinator: CoordinatorProps, Coordinator {
     let sceneViewController = UIViewController()
     
     func start(completion: Callback?) {
-        parentCoordinator?.sceneViewController.present(sceneViewController, animated: true) { [weak self] in
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: { [weak self] in
             if let `self` = self {
-                completion?(self)
+                self.parent?.disconnect(self, context: 0, completion: nil)
             }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                if let `self` = self {
-                    self.parent?.childFinished(identifier: self.identifier)
-                }
-            })
-        }
+        })
+        
+        completion?(self)
     }
     
     func stop(completion: Callback?) {
-        parentCoordinator?.sceneViewController.dismiss(animated: true) { [weak self] in
-            if let `self` = self {
-                completion?(self)
-            }
-        }
+        completion?(self)
     }
 }
